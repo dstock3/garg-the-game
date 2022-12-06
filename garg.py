@@ -13,7 +13,41 @@ class Monster:
         target.health -= self.damage
         print(f"{self.name} used {self.ability} on {target.name} for {self.damage} damage")
     
-#Define game world and its inhabitants
+#Define player class
+class Player:
+    def __init__(self):
+        self.name = "Player"
+        self.health = 100
+        self.damage = 20
+        self.abilities = ["Slash", "Heal"]
+        self.items = ["Health Potion", "Mana Potion"]
+        
+    def attack(self, target):
+        #Inflict damage
+        target.health -= self.damage
+        print(f"{self.name} used {self.ability} on {target.name} for {self.damage} damage")
+    
+    def use_ability(self, ability, target):
+        #Use ability on target
+        if ability == "Slash":
+            target.health -= self.damage * 2
+            print(f"{self.name} used {ability} on {target.name} for {self.damage * 2} damage")
+        elif ability == "Heal":
+            self.health += self.damage
+            print(f"{self.name} used {ability} and healed for {self.damage}")
+        else:
+            print(f"{ability} is not a valid ability")
+    
+    def use_item(self, item):
+        #Use item
+        if item == "Health Potion":
+            self.health += 50
+            print(f"{self.name} used {item} and healed for 50")
+        elif item == "Mana Potion":
+            print(f"{self.name} used {item} and restored their mana")
+        else:
+            print(f"{item} is not a valid item")
+    #Define game world and its inhabitants
 class World:
     def __init__(self):
         self.location = "R'lyeh"
@@ -37,10 +71,37 @@ class World:
     def combat(self, monster, target):
         while monster.health > 0 and target.health > 0:
             #Allow player to choose action
-            action = input("What will you do? [A]ttack or [R]un away")
+            print("What will you do?")
+            print("[A]ttack")
+            print("[U]se ability")
+            print("[I]tem")
+            print("[R]un away")
+            action = input()
             
             if action == "A":
                 monster.attack(target)
+            elif action == "U":
+                #Choose ability to use
+                for i, ability in enumerate(monster.abilities):
+                    print(f"{i + 1}: {ability}")
+                choice = input("Choose an ability to use: ")
+                try:
+                    chosen_ability = monster.abilities[int(choice) - 1]
+                except (ValueError, IndexError):
+                    print("Invalid choice")
+                    continue
+                monster.use_ability(chosen_ability, target)
+            elif action == "I":
+                #Choose item to use
+                for i, item in enumerate(monster.items):
+                    print(f"{i + 1}: {item}")
+                choice = input("Choose an item to use: ")
+                try:
+                    chosen_item = monster.items[int(choice) - 1]
+                except (ValueError, IndexError):
+                    print("Invalid choice")
+                    continue
+                monster.use_item(chosen_item)
             elif action == "R":
                 # Implement escape mechanism here
                 pass
@@ -68,6 +129,15 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()
+    
+    #Draw background
+    screen.fill((0, 0, 0))
+    
+    #Draw player
+    pygame.draw.rect(screen, (255, 255, 255), (100, 100, 20, 20))
+    
+    #Draw enemy
+    pygame.draw.rect(screen, (255, 0, 0), (500, 100, 20, 20))
     
     #Update game screen, handle input
     pygame.display.update()
